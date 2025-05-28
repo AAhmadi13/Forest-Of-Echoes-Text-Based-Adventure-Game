@@ -13,4 +13,4 @@ player Multi-user dungeon (“MUD”) – this would mean that the game would be
 being designed “from the ground-up” as capable of networking.
 6. A save game feature allowing you to continue a previous game from the last time it was 
 saved 
-7. 
+7.  
