@@ -8,7 +8,7 @@ CHECKPOINTS: List[Checkpoint] = [
     {
         "id": 1,
         "text": (
-            "Checkpoint 1: Entering the Forest\nbitch"
+            "Checkpoint 1: Entering the Forest\n"
             "As you stand at the threshold of the Forest of Echoes, the thick mist coils at your feet. "
             "The trees whisper tales of lost souls. Will you tread carefully or rush in boldly?\n"
             "🟢 Good/Cautious ➔ Path A\n🔴 Reckless ➔ Path B\n\n"
