@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest of Echoes - Complete Chronological Story</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d1b69 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+        
+        .timeline {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+
+        
+        .story-section {
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #4ecdc4;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+
+        
+        .story-row {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .story-node {
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .story-node:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        
+        .story-node::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            border-radius: 15px;
+            z-index: -1;
+        }
+        
+        /* Node Types */
+        .start { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .location { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .choice { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .action { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .death { background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%); }
+        .ending { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+        .respawn { background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%); }
+        .boss { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
+        .power { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: #333; }
+        .progression { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #333; }
+        
+        .node-title {
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .node-desc {
+            font-size: 1em;
+            line-height: 1.5;
+            text-align: left;
+        }
+        
+        .choice-options {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .choice-option {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .connector-line {
+            height: 3px;
+            background: linear-gradient(to right, rgba(78, 205, 196, 0.5), rgba(69, 183, 209, 0.5));
+            margin: 20px auto;
+            border-radius: 2px;
+            max-width: 200px;
+        }
+        
+        .branch-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .branch-visual::before {
+            content: '⚡';
+            font-size: 2em;
+            color: #4ecdc4;
+            text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .story-flow {
+            text-align: center;
+            font-size: 1.1em;
+            color: #4ecdc4;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        
+        .ending-summary {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 40px;
+            text-align: center;
+            border: 2px solid rgba(78, 205, 196, 0.3);
+        }
+        
+        .ending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .ending-item {
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .story-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .story-node {
+                min-width: 90%;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌲 Forest of Echoes</h1>
+        <div class="subtitle">Complete Chronological Adventure Story</div>
+        <p>Follow the hero's journey from forest entry to ultimate victory or defeat</p>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+            <span>Start Point</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+            <span>Location</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+            <span>Decision Point</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);"></div>
+            <span>Progression</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"></div>
+            <span>Heart Power</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);"></div>
+            <span>Boss Fight</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);"></div>
+            <span>Victory</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);"></div>
+            <span>Death</span>
+        </div>
+    </div>
+    
+    <div class="timeline">
+        <!-- Chapter 1: The Beginning -->
+        <div class="story-section">
+            <div class="section-header">🌟 Chapter 1: The Journey Begins</div>
+            
+            <div class="story-row">
+                <div class="story-node start">
+                    <div class="node-title">🌲 Forest Entry</div>
+                    <div class="node-desc">
+                        You stand at the edge of the mysterious Forest of Echoes, drawn by legends of the Crown of Pyros. Ancient trees tower above, their branches whispering secrets of the past. The adventure of a lifetime awaits within these shadows.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="connector-line"></div>
+            <div class="story-flow">The path splits ahead...</div>
+            
+            <div class="story-row">
+                <div class="story-node choice">
+                    <div class="node-title">🔀 The First Choice</div>
+                    <div class="node-desc">
+                        Two paths diverge before you in the twilight forest. Your decision here will shape the entire adventure ahead.
+                    </div>
+                    <div class="choice-options">
+                        <div class="choice-option">🔵 Left Path → Glowing Cave</div>
+                        <div class="choice-option">🌿 Right Path → Shrouded Path</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chapter 2: Discovery -->
+        <div class="story-section">
+            <div class="section-header">🗝️ Chapter 2: Paths of Discovery</div>
+            
+            <div class="story-row">
+                <div class="story-node location">
+                    <div class="node-title">🔵 The Glowing Cave</div>
+                    <div class="node-desc">
+                        <strong>If you chose left:</strong><br>
+                        A mysterious blue glow emanates from within this cave. As you approach, you discover a sealed gate blocking your progress. Ancient runes suggest you need a special relic to unlock it. Without the key, you must turn back.
+                    </div>
+                </div>
+                
+                <div class="story-node location">
+                    <div class="node-title">🌿 The Shrouded Path</div>
+                    <div class="node-desc">
+                        <strong>If you chose right:</strong><br>
+                        Thick vines hang like curtains, obscuring the way forward. You discover a wounded traveler trapped in thorny vines, struggling weakly. On the ground nearby lies a glowing relic - the key you need! You pocket the relic and note the traveler's location.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="branch-visual"></div>
+            <div class="story-flow">Both paths converge at the cave entrance...</div>
+            
+            <div class="story-row">
+                <div class="story-node progression">
+                    <div class="node-title">🔓 The Gate Opens</div>
+                    <div class="node-desc">
+                        With the relic in hand (from the Shrouded Path), you return to the Glowing Cave. The ancient gate recognizes the key and opens with a deep rumble, revealing stairs descending into the earth. The real adventure begins now.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chapter 3: The Heart -->
+        <div class="story-section">
+            <div class="section-header">💎 Chapter 3: The Heart of Power</div>
+            
+            <div class="story-row">
+                <div class="story-node location">
+                    <div class="node-title">💎 Deep Cave Chamber</div>
+                    <div class="node-desc">
+                        You emerge into a vast underground chamber. In the center, floating above an ancient altar, pulses the <strong>Heart of Yurei</strong> - a crystalline artifact radiating immense power. Three tunnel mouths lead deeper into the mountain, each offering a different path forward.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-row">
+                <div class="story-node choice">
+                    <div class="node-title">💫 The Heart's Calling</div>
+                    <div class="node-desc">
+                        The Heart of Yurei calls to you. This decision will fundamentally change your journey's trajectory.
+                    </div>
+                    <div class="choice-options">
+                        <div class="choice-option">⚡ Absorb the Heart → Gain lightning powers</div>
+                        <div class="choice-option">💼 Store the Heart → Keep for later use</div>
+                    </div>
+                </div>
+                
+                <div class="story-node location">
+                    <div class="node-title">🌀 Whispering Cave</div>
+                    <div class="node-desc">
+                        <strong>Left tunnel:</strong><br>
+                        A complex maze awaits within. Navigate carefully through ancient traps and puzzles to claim the <strong>Enchanted Sword</strong> at its heart. This blade will be crucial for freeing the trapped traveler.
+                    </div>
+                </div>
+                
+                <div class="story-node location">
+                    <div class="node-title">🏔️ Echoing Ledge</div>
+                    <div class="node-desc">
+                        <strong>Right tunnel:</strong><br>
+                        This path leads to a high mountain ledge with a breathtaking view. Here you'll find a detailed maze map, but more importantly, the ledge is too high to climb alone. You'll need the traveler's help to reach the Mountain Peak.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-row">
+                <div class="story-node power">
+                    <div class="node-title">⚡ Heart Absorbed</div>
+                    <div class="node-desc">
+                        <strong>If you chose to absorb:</strong><br>
+                        Lightning courses through your veins! You gain incredible powers but fall into a 6-hour trance. When you awaken, you can create energy barriers, shoot lightning, and your body radiates a protective fiery aura. You are transformed.
+                    </div>
+                </div>
+                
+                <div class="story-node action">
+                    <div class="node-title">💼 Heart Stored</div>
+                    <div class="node-desc">
+                        <strong>If you chose to store:</strong><br>
+                        You carefully place the Heart in your pack. It pulses gently, waiting for the right moment. You retain your humanity but remain vulnerable to the dangers ahead. Sometimes wisdom lies in restraint.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chapter 4: Preparation -->
+        <div class="story-section">
+            <div class="section-header">⚔️ Chapter 4: Gathering Strength</div>
+            
+            <div class="story-row">
+                <div class="story-node progression">
+                    <div class="node-title">🗿 Maze Conquered</div>
+                    <div class="node-desc">
+                        <strong>Essential Step 1:</strong><br>
+                        You navigate the treacherous maze in Whispering Cave, avoiding spike traps and solving ancient puzzles. Your reward: the legendary Enchanted Sword, glowing with magical energy. This blade can cut through anything.
+                    </div>
+                </div>
+                
+                <div class="story-node progression">
+                    <div class="node-title">✂️ Traveler Freed</div>
+                    <div class="node-desc">
+                        <strong>Essential Step 2:</strong><br>
+                        You return to the Shrouded Path with your Enchanted Sword. The magical blade easily cuts through the thorny vines binding the wounded traveler. Grateful and healed, they pledge to help you reach the Crown of Pyros.
+                    </div>
+                </div>
+                
+                <div class="story-node progression">
+                    <div class="node-title">🧗 United Ascent</div>
+                    <div class="node-desc">
+                        <strong>Essential Step 3:</strong><br>
+                        Together with your companion, you return to Echoing Ledge. The traveler helps boost you up the impossible cliff face. At last, you can reach the Mountain Peak where the dragon Pyros guards the legendary Crown.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chapter 5: The Final Battle -->
+        <div class="story-section">
+            <div class="section-header">🔥 Chapter 5: The Dragon's Challenge</div>
+            
+            <div class="story-row">
+                <div class="story-node boss">
+                    <div class="node-title">🐉 PYROS THE FIRE DRAGON</div>
+                    <div class="node-desc">
+                        The Mountain Peak stretches before you, and there it stands - Pyros, the ancient Fire Dragon. Scales like molten metal, eyes like burning coals, breath that can melt stone. Behind the beast, the Crown of Pyros gleams on its pedestal. This is the moment everything has led to.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-row">
+                <div class="story-node choice">
+                    <div class="node-title">⚔️ STAND AND FIGHT</div>
+                    <div class="node-desc">
+                        Face the dragon head-on in epic combat. Your success depends entirely on whether you absorbed the Heart of Yurei or not. Two completely different battle experiences await.
+                    </div>
+                </div>
+                
+                <div class="story-node choice">
+                    <div class="node-title">🏃 TACTICAL RETREAT</div>
+                    <div class="node-desc">
+                        Sometimes wisdom is knowing when to run. But even retreat has its dangers, and the traveler might stumble, forcing you to choose between loyalty and survival.
+                    </div>
+                </div>
+                
+                <div class="story-node choice">
+                    <div class="node-title">🌳 HIDE IN THE TREES</div>
+                    <div class="node-desc">
+                        Climb the nearby tree to escape. But beware - this path always ends in death, whether from venomous snakes or hidden spike traps. Sometimes the "safe" choice is the most dangerous.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chapter 6: Battle Outcomes -->
+        <div class="story-section">
+            <div class="section-header">⚡ Chapter 6: Powers Unleashed</div>
+            
+            <div class="story-row">
+                <div class="story-node power">
+                    <div class="node-title">🛡️ Lightning Warrior</div>
+                    <div class="node-desc">
+                        <strong>If you have Heart Power:</strong><br>
+                        Your fiery aura deflects dragon fire! You create energy barriers, shoot lightning bolts, and your Enchanted Sword crackles with divine power. The battle becomes an epic clash between two forces of nature.
+                    </div>
+                </div>
+                
+                <div class="story-node action">
+                    <div class="node-title">🗡️ Mortal Hero</div>
+                    <div class="node-desc">
+                        <strong>Without Heart Power:</strong><br>
+                        You rely on skill, cunning, and teamwork. Every dodge matters, every strategy counts. You must use the environment, coordinate with your traveler companion, and fight with pure human determination.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chapter 7: All Endings -->
+        <div class="story-section">
+            <div class="section-header">🏆 Chapter 7: Destiny Fulfilled</div>
+            
+            <div class="story-row">
+                <div class="story-node ending">
+                    <div class="node-title">👑 Ascension of Flamebearer</div>
+                    <div class="node-desc">
+                        <strong>Heart Power + Perfect Fight:</strong><br>
+                        You leap into the sky wreathed in lightning and flame, matching the dragon in aerial combat. Your blade pierces its heart as you both fall, but you survive, transformed into a legendary Flamebearer.
+                    </div>
+                </div>
+                
+                <div class="story-node ending">
+                    <div class="node-title">👻 Master of the Heart</div>
+                    <div class="node-desc">
+                        <strong>Heart Power + Spirit Magic:</strong><br>
+                        You summon ethereal chains that bind the dragon, forcing it from the sky. Yurei's ancient magic flows through you as you claim victory through supernatural power.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-row">
+                <div class="story-node ending">
+                    <div class="node-title">🏆 Dragon Slayer</div>
+                    <div class="node-desc">
+                        <strong>Mortal Hero + Perfect Teamwork:</strong><br>
+                        Through flawless coordination with your traveler companion, you signal them at the perfect moment. Together, you bring down the mighty dragon through pure skill and friendship.
+                    </div>
+                </div>
+                
+                <div class="story-node ending">
+                    <div class="node-title">🏅 Crown Without Power</div>
+                    <div class="node-desc">
+                        <strong>Survival Victory:</strong><br>
+                        You manage to grab the Crown and escape while the dragon is distracted. Your companion falls, but you survive to tell the tale. Victory, but at a heavy cost.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-row">
+                <div class="story-node ending">
+                    <div class="node-title">🏅 Outwitted Flame</div>
+                    <div class="node-desc">
+                        <strong>Strategic Retreat Victory:</strong><br>
+                        You help your stumbling companion, return to face Pyros together, and cleverly lure the dragon to a cliff edge. Brains triumph over brawn in this tactical victory.
+                    </div>
+                </div>
+                
+                <div class="story-node death">
+                    <div class="node-title">💀 Hero's Sacrifice</div>
+                    <div class="node-desc">
+                        <strong>Mutual Destruction:</strong><br>
+                        You and the dragon destroy each other in a final, desperate leap attack. A pyrrhic victory that ends in death, but you die a hero's death.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Respawn System -->
+        <div class="story-section">
+            <div class="section-header">🔄 The Eternal Loop</div>
+            
+            <div class="story-row">
+                <div class="story-node respawn">
+                    <div class="node-title">🏔️ Echoing Ledge Checkpoint</div>
+                    <div class="node-desc">
+                        <strong>Death is Not the End:</strong><br>
+                        No matter how you die - snake venom, spike traps, dragon fire, witch's curse - you always awaken back at Echoing Ledge. With each death, you gain knowledge. Eventually, you WILL find a path to victory. The mountain remembers, and so do you.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ending-summary">
+        <h2>🎯 Complete Story Breakdown</h2>
+        <div class="ending-grid">
+            <div class="ending-item">
+                <h3>🏆 Victory Paths: 5</h3>
+                <p>• Ascension of Flamebearer<br>• Master of the Heart<br>• Dragon Slayer<br>• Crown Without Power<br>• Outwitted Flame</p>
+            </div>
+            <div class="ending-item">
+                <h3>💀 Death Scenarios: 6+</h3>
+                <p>• Snake venom/Spike traps<br>• Witch's poison/sleep trap<br>• Dragon fire incineration<br>• Hero's mutual sacrifice<br>• All trigger respawn!</p>
+            </div>
+            <div class="ending-item">
+                <h3>🔑 Key Mechanics</h3>
+                <p>• Heart Power changes everything<br>• Traveler companion essential<br>• Multiple solution paths<br>• Respawn system prevents game over</p>
+            </div>
+            <div class="ending-item">
+                <h3>📚 Story Themes</h3>
+                <p>• Power vs. humanity<br>• Friendship and sacrifice<br>• Courage in the face of death<br>• Multiple paths to heroism</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Enhanced interactive effects
+        document.querySelectorAll('.story-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+                this.style.boxShadow = '0 15px 35px rgba(0,0,0,0.4)';
+            });
+            
+            node.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+            });
+            
+            node.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                }, 150);
+            });
+        });
+        
+        // Scroll-triggered animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.story-section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'all 0.6s ease-out';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
