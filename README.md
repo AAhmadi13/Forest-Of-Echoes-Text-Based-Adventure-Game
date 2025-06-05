@@ -36,6 +36,7 @@
       use
       take
       examine
+      
 29: Fix: Logic for rescuing the traveler does not work ✅ **[STEVE]**
 30: Improve: script at the end of achieving the enchanted sword ✅ **[STEVE]**
 31: Fix: when using inventory command avoid prompting the room description, it happens with almost all commands such as 'map' ✅ **[STEVE]**
