@@ -38,15 +38,25 @@
       examine
       
 29: Fix: Logic for rescuing the traveller does not work ✅ **[STEVE]**
+
 30: Improve: script at the end of achieving the enchanted sword ✅ **[STEVE]**
+
 31: Fix: when using the inventory command, avoid prompting the room description, it happens with almost all commands, such as 'map' ✅ **[STEVE]**
+
 32: Fix: save and load ✅ **[STEVE]**
+
 33: Adapt: changes made from adam on past code to new ✅ **[STEVE]**
+
 34: Fix: items should no longer prompt as in being present in the room if they are taken, this goes for all rooms Changing prompts to keep the sense of the context valid, e.g., if the relic is taken from the traveler, then no longer say the relic is on the traveller's hand  ✅ **[STEVE]**
+
 35: respawn command works only in the maze ✅ **[STEVE]**
+
 36: Dynamic prompting of room descriptions so that it makes sense after performing changes to it, such as rescuing the traveller, it should not longer prompt that the traveller is bonded to the vines when returned to the shrouded path room, the same goes for all other rooms ✅ **[STEVE]**
+
 37: Fix: after loading game from a save file, the gate resets and you need to use the relic again, e.g., deep cave to glowing cave, then go deep cave again, and the gate is closed ✅ **[STEVE]**
+
 38: Fix: Final boss battle death ending. As you are respawned back to the echoing ledge room after dying and enter the boss room again, the mountain peak introduction no longer prompts ❌❌ <-- Must fix, minor bug
+
 39: MUD Multi-User Dungeon - Plan and implement the game from being a single-player text adventure into a multi-player Multi-user dungeon (“MUD”) – this would mean that the game would benefit from being designed “from the ground-up” as capable of networking - ❌
 
 
