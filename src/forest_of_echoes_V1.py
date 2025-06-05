@@ -2,7 +2,7 @@ import json
 import os
 from typing import Dict, List, Union, Callable, Any
 
-# ========== DECLARATIVE GAME CONFIGURATION ==========
+# ========== AUTHORS: Adam H. Ahmadi 23160330 - Steve M. Montenegro 23166613  ==========
 
 GAME_CONFIG = {
     "intro_text": """
