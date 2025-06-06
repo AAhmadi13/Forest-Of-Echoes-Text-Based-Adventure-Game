@@ -2,7 +2,7 @@ import json
 import os
 from typing import Dict, List, Union, Callable, Any
 
-# ========== AUTHORS: Adam H. Ahmadi 23160330 - Steve M. Montenegro 23166613  ==========
+# ========== DECLARATIVE GAME CONFIGURATION ==========
 
 GAME_CONFIG = {
     "intro_text": """
@@ -179,7 +179,10 @@ Your journey begins now.
                         "\nYou both return to face Pyros, scarred but determined.",
                         "(Continue to the battle sequence.)"
                     ],
-                    "effects": {"set_flag": "helped_traveler"}
+                    "effects": {
+                        "set_flag": "helped_traveler",
+                        "continue_to": "cover_choices" #This will trigger the fight sequence
+                    }
                 },
                 "2": {
                     "lines": [
@@ -240,12 +243,11 @@ Your journey begins now.
         },
         "glowing_cave": {
             "description": lambda state: (
-                "Blue crystals pulse in the cave walls. A sealed gate blocks your path forward."
+                "Blue crystals pulse in the cave walls. A sealed gate blocks your path forward.\nThe gate's surface has indented markings - the shape suggests something\nsmall and angular should be placed there, though you see no keyhole."
                 if not state["event_flags"].get("unlocked_gate", False)
                 else "Blue crystals pulse in the cave walls. The gate stands open, revealing a path forward."
             ),
             "exits": {"right": "forest_entry"},
-            "items": [],
             "obstacle": {
                 "name": "gate",
                 "required_item": "relic",
@@ -273,7 +275,7 @@ Your journey begins now.
             "obstacle": {
                 "name": "vines",
                 "required_item": "enchanted_sword",
-                "success_msg": "You slash the vines with your sword. The traveler gasps in relief and thanks you. He now joins you as a companion.",
+                "success_msg": "You slash the vines with your sword.\nThe traveler gasps in relief and thanks you. He now joins you as a companion.",
                 "effects": {
                     "trigger_event": "free_traveler"
                 }
@@ -291,8 +293,9 @@ Your journey begins now.
         },
         "whispering_cave": {
             "description":
-                "You're at the mouth of a massive underground maze carved into the cavern wall.\n"
-                "The air is dense, and the echo of dripping water mixes with distant whispers.",
+                "The air is dense, and the echo of dripping water mixes with distant whispers.\n"
+                "Ahead lies the entrance to a winding stone maze (go forward to enter).\n"
+                "The ancients must have left clues to navigate it.",
             "exits": {"right": "deep_cave"},
             "items": lambda state: [] if state.get("maze_completed", False) or "enchanted_sword" in state.get("collected_items", []) else ["enchanted_sword"],
             "obstacle": {
@@ -326,11 +329,11 @@ Your journey begins now.
         },
         "echoing_ledge": {
             "description": lambda state: (
-                "This narrow chamber hums with energy. In front of you, a dusty stone pedestal holds a rolled-up parchment — its surface faintly glowing.\n"
-                "To your right, a steep rock face rises high — too far to climb alone."
+                "This narrow chamber hums with energy.\nIn front of you, a dusty stone pedestal holds a rolled-up parchment — its surface faintly glowing.\n"
+                "To your right, a steep rock face rises high — too far to climb alone.\n(go 'right' to try climb the ledge)"
                 if "maze_map" not in state.get("collected_items", [])
                 else "This narrow chamber hums with energy. The stone pedestal stands empty.\n"
-                     "To your right, a steep rock face rises high — too far to climb alone."
+                     "To your right, a steep rock face rises high — too far to climb alone.\n(go 'right' to try climb the ledge)"
             ),
             "exits": {"left": "deep_cave"},
             "items": lambda state: ["maze_map"] if "maze_map" not in state.get("collected_items", []) else [],
@@ -353,15 +356,14 @@ Your journey begins now.
             },
         },
         "mountain_peak": {
-            "description":
-                "You stand atop the scorched summit of Mount Duskveil."
-                "\nBefore you looms the colossal Fire Dragon, Pyros, its scales glowing like molten lava."
-                "\nThe legendary Crown of Pyros rests upon a rock altar behind the beast, radiating power."
-                "\nThis is the final confrontation. Your choices now will shape your fate."
-                "\n🔥 FINAL BATTLE – The Fire Dragon Pyros awakens! 🔥"
-                "\nThe ground trembles. Smoke rises. You must decide:",
             "exits": {},
-            "trigger_boss": True
+            "trigger_boss": {
+                "prompt": "You stand atop the scorched summit of Mount Duskveil.\n"
+                "Before you looms the colossal Fire Dragon, Pyros, its scales glowing like molten lava.\n"
+                "The legendary Crown of Pyros rests upon a rock altar behind the beast, radiating power.\n"
+                "This is the final confrontation. Your choices now will shape your fate.\n"
+                "🔥 FINAL BATTLE - The Fire Dragon Pyros awakens! 🔥\nThe ground trembles. Smoke rises. You must decide:"
+            }
         }
     },
 
@@ -403,7 +405,7 @@ Your journey begins now.
             }
         },
         "maze_map": {
-            "description": "A faded parchment showing the maze layout. Key turns are marked in red pigment — a clear guide through the Whispering Maze.",
+            "description": "A faded parchment showing the maze layout.\nKey turns are marked in red pigment — a clear guide through the Whispering Maze.",
             "interaction": {
                 "prompt": "You unfold the parchment and study the sketch:",
                 "display": """
@@ -446,7 +448,7 @@ S = Start, ↓ = Retreat (Return to Cave), T = Trap, E = Exit, # = Wall
             "action": lambda state: {
                 "output": """
 Commands:
-- go [direction]: Move in a direction (left, right, forward, behind)
+- left/right/forward/behind: Move in a direction 
 - examine: Examine area 
 - examine [item]: Examine an item in your inventory
 - take [item]: Pick up an item
@@ -500,6 +502,77 @@ Commands:
             "description": "Load the game",
             "action": lambda state: load_game(state)
         }
+    },
+    "obstacle_resets": {
+        "glowing_cave": {
+        "description": lambda state: (
+            "Blue crystals pulse in the cave walls. A sealed gate blocks your path forward.\n"
+            "The gate's surface has indented markings - the shape suggests something\n"
+            "small and angular should be placed there, though you see no keyhole."
+            if not state["event_flags"].get("unlocked_gate", False)
+            else "Blue crystals pulse in the cave walls. The gate stands open, revealing a path forward."
+        ),
+        "exits": {"right": "forest_entry"},
+        "items": [],
+        "obstacle": {
+            "name": "gate",
+            "required_item": "relic",
+            "success_msg": "The relic glows and unlocks the gate. The path forward is now open.",
+            "effects": {
+                "set_flag": {"unlocked_gate": True},
+                "unlock_exit": "forward",
+                "unlock_destination": "deep_cave"
+            }
+        }
+    },
+    "echoing_ledge": {
+        "description": lambda state: (
+            "This narrow chamber hums with energy.\n"
+            "In front of you, a dusty stone pedestal holds a rolled-up parchment — its surface faintly glowing.\n"
+            "To your right, a steep rock face rises high — too far to climb alone.\n"
+            "(go 'right' to try climb the ledge)"
+            if "maze_map" not in state.get("collected_items", [])
+            else "This narrow chamber hums with energy. The stone pedestal stands empty.\n"
+                 "To your right, a steep rock face rises high — too far to climb alone.\n"
+                 "(go 'right' to try climb the ledge)"
+        ),
+        "exits": {"left": "deep_cave"},
+        "items": lambda state: ["maze_map"] if "maze_map" not in state.get("collected_items", []) else [],
+        "obstacle": {
+            "name": "high_ledge",
+            "direction": "right",
+            "description": lambda state: (
+                "The sheer cliff face towers above you. It's impossible to climb alone."
+                if not state["event_flags"].get("helped_traveler", False)
+                else "The traveler eyes the cliff and nods. 'Together we can scale this.'"
+            ),
+            "required_helper": "helped_traveler",
+            "success_msg": "With the traveler's help, you scale the high ledge to the mountain peak.",
+            "effects": {
+                "unlock_exit": "right",
+                "unlock_destination": "mountain_peak",
+                "move_player": True
+            }
+        }
+    }
+    },
+    "initial_state": {
+        "location": "forest_entry",
+        "inventory": [],
+        "visited": ["forest_entry"],
+        "event_flags": {
+            "helped_traveler": False,
+            "absorbed_heart": False,
+            "right_hand_injured": False,
+            "unlocked_gate": False,
+            "unlocked_vines": False
+        },
+        "collected_items": [],
+        "completed_obstacles": [],
+        "maze_mode": False,
+        "maze_position": None,
+        "just_entered": True,
+        "continue_battle_from": None
     }
 }
 
@@ -536,6 +609,15 @@ def apply_effects(state: Dict, effects: Dict) -> Dict:
                 **new_state.get("event_flags", {}),
                 effects["set_flag"]: True
             }
+    # Handle continue_to battle sequence
+    if effects.get("continue_to"):
+        new_state["continue_battle_from"] = effects["continue_to"]
+        new_state["in_boss_battle"] = True
+
+    # Handle battle trigger
+    if effects.get("trigger_battle"):
+        new_state["in_boss_battle"] = True
+        new_state["location"] = "mountain_peak"  # Return to boss location
 
     # Handle item modifications
     if effects.get("remove_item"):
@@ -611,23 +693,33 @@ def handle_movement(state: Dict, direction: str, current_config: Dict) -> Dict:
                 # Check if we should move the player after overcoming obstacle
                 if obstacle["effects"].get("move_player", False):
                     destination = obstacle["effects"]["unlock_destination"]
-                    new_state["location"] = destination
-                    new_state["just_entered"] = True
+                    new_state = {
+                        **new_state,
+                        "location": destination,
+                        "just_entered": True
+                    }
 
-                    # Get destination room description
+                    # For boss rooms, only return success message without description
+                    if current_config["rooms"][destination].get("trigger_boss"):
+                        return {
+                            "state": new_state,
+                            "output": success_msg,  # Just the climb success message
+                            "config": current_config,
+                            "trigger_boss": True
+                        }
+
+                    # For normal rooms, show both success message and description
                     dest_room = current_config["rooms"][destination]
                     dest_description = dest_room["description"]
                     if callable(dest_description):
                         dest_description = dest_description(new_state)
 
-                    # Combine obstacle success message with destination description
                     full_output = f"{success_msg}\n\n{dest_description}"
 
                     return {
                         "state": new_state,
                         "output": full_output,
-                        "config": current_config,
-                        "trigger_boss": dest_room.get("trigger_boss", False)  # Flag to trigger boss after showing description
+                        "config": current_config
                     }
 
                 return {
@@ -640,19 +732,38 @@ def handle_movement(state: Dict, direction: str, current_config: Dict) -> Dict:
     if direction in room.get("exits", {}):
         new_location = room["exits"][direction]
         new_visited = state["visited"] + [new_location] if new_location not in state["visited"] else state["visited"]
-        new_state = {**state, "location": new_location, "visited": new_visited, "maze_mode": False,
-                     "just_entered": True}
+        new_state = {
+            **state,
+            "location": new_location,
+            "visited": new_visited,
+            "maze_mode": False,
+            "just_entered": True
+        }
 
-        # Check if new location triggers boss battle
         if current_config["rooms"][new_location].get("trigger_boss"):
             return {
                 "state": new_state,
-                "trigger_boss": True  # Flag to trigger boss after showing description
+                "trigger_boss": True
             }
 
         return {"state": new_state, "config": current_config}
 
     return {"state": state, "output": "You can't go that way.", "config": current_config}
+
+
+def respawn_player(state: Dict) -> Dict:
+    """Respawn player at checkpoint declaratively"""
+    print("\nYou feel your soul being pulled back...")
+    print("You awaken at the echoing ledge. This is your checkpoint.\n")
+    return {
+        "state": {
+            **state,
+            "location": "echoing_ledge",
+            "just_entered": True,
+            "in_boss_battle": False,
+            "continue_battle_from": None
+        }
+    }
 
 
 def handle_maze_movement(state: Dict, direction: str, current_config: Dict) -> Dict:
@@ -714,7 +825,9 @@ def handle_maze_movement(state: Dict, direction: str, current_config: Dict) -> D
             new_state.pop("maze_position", None)
             return {
                 "state": new_state,
-                "output": "You reach the maze's end again. The stone pedestal stands empty, where the sword once rested",
+                "output": "You reach the maze's end again. The stone pedestal stands empty, where the sword once rested.\n"
+                          "You follow a tunnel returning you outside the maze",
+
                 "config": current_config
             }
         else:
@@ -729,7 +842,8 @@ def handle_maze_movement(state: Dict, direction: str, current_config: Dict) -> D
             new_state.pop("maze_position", None)
             return {
                 "state": new_state,
-                "output": "You've reached the end of the maze!\nBefore you stands an ornate pedestal holding an enchanted sword that hums with power.",
+                "output":  "You've reached the end of the maze!\nBefore you stands an ornate pedestal holding an enchanted sword that hums with power.\n"
+                        "The sword secured, you follow a tunnel returning you outside the maze",
                 "config": current_config
             }
 
@@ -831,9 +945,7 @@ def handle_fight_sequence(state: Dict) -> Dict:
                     if outcome["effects"].get("fatal"):
                         return respawn_player(new_state)
                     if outcome["effects"].get("concludes"):
-                        print("\nThank you for playing!")
-                        exit(0)
-
+                        return handle_game_conclusion()
                     state = new_state
                 break
             else:
@@ -856,7 +968,18 @@ def handle_run_sequence(state: Dict) -> Dict:
                 print(line)
 
             if "effects" in option:
-                state = apply_effects(state, option["effects"])
+                new_state = apply_effects(state, option["effects"])
+
+                # If we're continuing to battle, handle that immediately
+                if option["effects"].get("continue_to"):
+                    return {"state": new_state}  # Let game loop handle the continuation
+
+                # Special handling for returning to battle
+                if option["effects"].get("trigger_battle"):
+                    print("\n" + GAME_CONFIG["rooms"]["mountain_peak"]["trigger_boss"]["prompt"])
+                    return handle_boss_battle(new_state)
+
+                return {"state": new_state}
 
             if "next" in option:
                 next_step = option["next"]
@@ -871,15 +994,15 @@ def handle_run_sequence(state: Dict) -> Dict:
                             print(line)
 
                         if "effects" in nested_outcome:
-                            state = apply_effects(state, nested_outcome["effects"])
+                            new_state = apply_effects(state, nested_outcome["effects"])
                             if nested_outcome["effects"].get("fatal"):
-                                return respawn_player(state)
-                        break
+                                return respawn_player(new_state)
+                            if nested_outcome["effects"].get("concludes"):
+                                return handle_game_conclusion()
+                        return {"state": new_state}
                     else:
                         print("Please type 'yes' or 'no'.")
 
-            if choice == "1":  # Helped traveler
-                return handle_run_battle_sequence(state)
             return {"state": state}
         else:
             print("Invalid choice. Choose 1 or 2.")
@@ -903,8 +1026,7 @@ def handle_run_battle_sequence(state: Dict) -> Dict:
 
             if "effects" in outcome:
                 if outcome["effects"].get("concludes"):
-                    print("\nThank you for playing!")
-                    exit(0)
+                    return handle_game_conclusion()
                 if outcome["effects"].get("fatal"):
                     return respawn_player(state)
 
@@ -930,13 +1052,63 @@ def handle_generic_sequence(state: Dict, sequence: Dict) -> Dict:
                 if outcome["effects"].get("fatal"):
                     return respawn_player(state)
                 if outcome["effects"].get("concludes"):
-                    print("\nThank you for playing!")
-                    exit(0)
+                    return handle_game_conclusion()
 
             return {"state": state}
         else:
             print("Invalid choice. Try again.")
 
+
+def handle_sequence_step(state: Dict, step_config: Dict) -> Dict:
+    """Handle a single step in a battle sequence"""
+    print("\n" + step_config["prompt"])
+
+    while True:
+        choice = input("> ").strip()
+        if choice in step_config["options"]:
+            outcome = step_config["options"][choice]
+
+            for line in outcome.get("lines", []):
+                print(line)
+
+            if "effects" in outcome:
+                new_state = apply_effects(state, outcome["effects"])
+                if outcome["effects"].get("fatal"):
+                    # Return both state and fatal flag
+                    return {
+                        "state": respawn_player(new_state)["state"],
+                        "fatal": True
+                    }
+                if outcome["effects"].get("concludes"):
+                    return handle_game_conclusion()
+                return {"state": new_state}
+            return {"state": state}
+        else:
+            print("Invalid choice. Try again.")
+
+def handle_game_conclusion():
+    """Handle game conclusion with complete game reset"""
+    print("\nThank you for playing!")
+
+    while True:
+        replay = input("Would you like to play again? (yes/no): ").strip().lower()
+        if replay == "yes":
+            # Reset room configurations
+            for room_name, initial_config in GAME_CONFIG.get("obstacle_resets", {}).items():
+                if room_name in GAME_CONFIG["rooms"]:
+                    GAME_CONFIG["rooms"][room_name].update(initial_config)
+
+            # Create fresh state from initial configuration
+            initial_state = GAME_CONFIG["initial_state"].copy()
+
+            # Start new game with fresh state
+            game_loop(initial_state)
+            return {"state": None}
+        elif replay == "no":
+            print("Goodbye!")
+            exit(0)
+        else:
+            print("Please enter 'yes' or 'no'.")
 
 def respawn_player(state: Dict) -> Dict:
     """Respawn player at checkpoint declaratively"""
@@ -946,7 +1118,8 @@ def respawn_player(state: Dict) -> Dict:
         "state": {
             **state,
             "location": "echoing_ledge",
-            "just_entered": True  # Ensure room description shows again
+            "just_entered": True,  # To ensure room description shows again
+            "in_boss_battle": False  # reset boss state
         }
     }
 
@@ -1177,53 +1350,61 @@ def normalize_item_name(item_name: str) -> str:
 
 # ========== GAME LOOP ==========
 
-def game_loop():
-    """Updated game loop with proper configuration handling"""
+def game_loop(initial_state=None):
+    """Main game loop with configurable initial state"""
     print(GAME_CONFIG["intro_text"])
     print("Type 'help' to see controls.")
 
-    # Initialize fresh state
-    state = {
-        "location": "forest_entry",
-        "inventory": [],
-        "visited": ["forest_entry"],
-        "event_flags": {
-            "helped_traveler": False,
-            "absorbed_heart": False,
-            "right_hand_injured": False,
-            "unlocked_gate": False,
-            "unlocked_vines": False
-        },
-        "maze_mode": False,
-        "maze_position": None,
-        "collected_items": [],
-        "just_entered": True
-    }
-
-    default_state = state.copy()
+    state = initial_state if initial_state else GAME_CONFIG["initial_state"].copy()
     current_config = {**GAME_CONFIG}
 
     while True:
-        # Show room description only when first entering or when explicitly examining
-        if state.get("just_entered"):
+        # Show room description if we're in a normal room and just entered
+        if state.get("just_entered") and state["location"] in current_config["rooms"]:
             room = current_config["rooms"][state["location"]]
-            description = room["description"]
-            if callable(description):
-                description = description(state)
-            print(f"\n{description}")
+            if "description" in room:
+                description = room["description"]
+                if callable(description):
+                    description = description(state)
+                print(f"\n{description}")
 
-            # Show items in room
-            items = room.get("items", [])
-            if callable(items):
-                items = items(state)
-            if items:
-                print("Items in room:")
-                for item in items:
-                    print(f"- {item.replace('_', ' ')}")
+                items = room.get("items", [])
+                if callable(items):
+                    items = items(state)
+                if items:
+                    print("Items in room:")
+                    for item in items:
+                        print(f"- {item.replace('_', ' ')}")
 
             state["just_entered"] = False
 
         try:
+            # Handle continued battle sequence before accepting new input
+            if state.get("continue_battle_from"):
+                battle_state = "absorbed_heart" if state["event_flags"].get("absorbed_heart") else "no_heart"
+                sequence = GAME_CONFIG["boss_battle_outcomes"]["fight_sequence"][battle_state]
+                start_from = state["continue_battle_from"]
+                state["continue_battle_from"] = None  # Clear it immediately
+
+                if start_from == "cover_choices":
+                    print("\nPyros roars as you return to the battle!")
+                    result = handle_sequence_step(state, sequence["cover_choices"])
+                    if "state" in result:
+                        state = result["state"]
+                        if result.get("fatal"):
+                            continue  # Skip rest if fatal
+
+                        result = handle_sequence_step(state, sequence["counter_choices"])
+                        if "state" in result:
+                            state = result["state"]
+                            if result.get("fatal"):
+                                continue  # Skip rest if fatal
+
+                            result = handle_sequence_step(state, sequence["final_choices"])
+                            if "state" in result:
+                                state = result["state"]
+                continue
+
             user_input = input("\n> ").strip().lower()
             if not user_input:
                 continue
@@ -1236,7 +1417,7 @@ def game_loop():
             command = parts[0]
             args = parts[1:] if len(parts) > 1 else []
 
-            # Handle respawn command first
+            # Handle respawn command
             if command == "respawn":
                 if state.get("maze_mode"):
                     state["maze_mode"] = False
@@ -1257,24 +1438,28 @@ def game_loop():
                     print(f"Usage: {command} [target]")
                     continue
 
-                # Handle examine command specially
                 if command == "examine":
                     if not args:
-                        room = current_config["rooms"][state["location"]]
-                        description = room["description"]
-                        if callable(description):
-                            description = description(state)
-                        result = {"output": f"\n{description}"}
+                        if state["location"] not in current_config["rooms"]:
+                            result = {"output": "Focus on the battle!"}
+                        else:
+                            room = current_config["rooms"][state["location"]]
+                            if "description" in room:
+                                description = room["description"]
+                                if callable(description):
+                                    description = description(state)
+                                result = {"output": f"\n{description}"}
+                            else:
+                                result = {"output": "You look around but see nothing noteworthy."}
 
-                        items = room.get("items", [])
-                        if callable(items):
-                            items = items(state)
-                        if items:
-                            result["output"] += "\nItems in room:\n" + "\n".join(
-                                f"- {i.replace('_', ' ')}" for i in items)
+                            items = room.get("items", [])
+                            if callable(items):
+                                items = items(state)
+                            if items:
+                                result["output"] += "\nItems in room:\n" + "\n".join(
+                                    f"- {i.replace('_', ' ')}" for i in items)
                     else:
                         result = current_config["commands"][command]["action"](state, args[0])
-                # Handle other commands
                 elif command in ["take", "use", "go"]:
                     result = current_config["commands"][command]["action"](state, *args, current_config)
                 elif command in ["inventory", "map", "save", "load", "help"]:
@@ -1299,22 +1484,26 @@ def game_loop():
             # Update state and config
             if "state" in result:
                 state = result["state"]
+
             if "config" in result:
                 current_config = result["config"]
+
             if "output" in result:
                 print(result["output"])
-            if "room_update" in result:
+
+            if "room_update" in result and state["location"] in current_config["rooms"]:
                 current_config["rooms"][state["location"]] = {
                     **current_config["rooms"][state["location"]],
                     **result["room_update"]
                 }
 
-            # Check for boss trigger after showing description
+            # Handle boss triggers
             if "trigger_boss" in result and result["trigger_boss"]:
+                print("\n" + GAME_CONFIG["rooms"]["mountain_peak"]["trigger_boss"]["prompt"])
                 boss_result = handle_boss_battle(state)
                 if "state" in boss_result:
                     state = boss_result["state"]
-                    state["just_entered"] = True  # Ensure room description shows again if respawned
+                    state["just_entered"] = True
 
         except Exception as e:
             print(f"Error: {str(e)}")
