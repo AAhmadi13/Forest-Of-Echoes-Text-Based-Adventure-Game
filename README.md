@@ -55,7 +55,9 @@
 
 37: Fix: after loading game from a save file, the gate resets and you need to use the relic again, e.g., deep cave to glowing cave, then go deep cave again, and the gate is closed ✅ **[STEVE]**
 
-38: Fix: Final boss battle death ending. As you are respawned back to the echoing ledge room after dying and enter the boss room again, the mountain peak introduction no longer prompts ❌❌ <-- Must fix, minor bug
+38: Fix: Final boss battle death ending. As you are respawned back to the echoing ledge room after dying and enter the boss room again, the mountain peak introduction no longer prompts ✅ **[STEVE]**
+39: Fix: Run sequence wasn't working ✅ **[STEVE]**
+40: Save and load massive bug with obstacles being bypassed without needing the required items or helper ✅ **[STEVE]**
 
 39: MUD Multi-User Dungeon - Plan and implement the game from being a single-player text adventure into a multi-player Multi-user dungeon (“MUD”) – this would mean that the game would benefit from being designed “from the ground-up” as capable of networking - ❌
 
