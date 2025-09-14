@@ -1089,26 +1089,7 @@ def handle_sequence_step(state: Dict, step_config: Dict) -> Dict:
 def handle_game_conclusion():
     """Handle game conclusion with complete game reset"""
     print("\nThank you for playing!")
-
-    while True:
-        replay = input("Would you like to play again? (yes/no): ").strip().lower()
-        if replay == "yes":
-            # Reset room configurations
-            for room_name, initial_config in GAME_CONFIG.get("obstacle_resets", {}).items():
-                if room_name in GAME_CONFIG["rooms"]:
-                    GAME_CONFIG["rooms"][room_name].update(initial_config)
-
-            # Create fresh state from initial configuration
-            initial_state = GAME_CONFIG["initial_state"].copy()
-
-            # Start new game with fresh state
-            game_loop(initial_state)
-            return {"state": None}
-        elif replay == "no":
-            print("Goodbye!")
-            exit(0)
-        else:
-            print("Please enter 'yes' or 'no'.")
+    exit(0)
 
 def respawn_player(state: Dict) -> Dict:
     """Respawn player at checkpoint declaratively"""
