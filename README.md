@@ -36,6 +36,6 @@ A Python-based, text-based adventure game that immerses the player in a rich, co
 
 <br>
 
-// **Author: Adam H. Ahmadi 2nd Year Computer Science Student** //<br>
+// **Author: Adam H. Ahmadi 3rd Year Computer Science Student** //<br>
 
 // **Warning: Viewing allowed; changes, distribution, or use of the original content needs the author’s permission** //
